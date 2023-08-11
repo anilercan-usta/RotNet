@@ -14,9 +14,36 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils import angle_error, RotNetDataGenerator
 from data.street_view import get_filenames as get_street_view_filenames
 
+import numpy as np
+# to measure exec time
+from timeit import default_timer as timer
 
-data_path = os.path.join('data', 'street_view')
-train_filenames, test_filenames = get_street_view_filenames(data_path)
+def get_filenames(path):
+    
+
+    image_paths = []
+    for filename in os.listdir(path):
+        view_id = filename.split('_')[1].split('.')[0]
+        # ignore images with markers (0) and upward views (5)
+        if not(view_id == '0' or view_id == '5'):
+            image_paths.append(os.path.join(path, filename))
+
+    # 90% train images and 10% test images
+    n_train_samples = int(len(image_paths) * 0.9)
+    train_filenames = image_paths[:n_train_samples]
+    test_filenames = image_paths[n_train_samples:]
+
+    #print(image_paths)
+
+    return train_filenames, test_filenames
+
+#data_path = os.path.join('data', 'street_view')
+#train_filenames, test_filenames = get_street_view_filenames(data_path)
+
+
+data_path = "C:\\Users\\anile\\Desktop\\sayac-okuma-part1.v3i.createml\\cropped_sayac"
+
+train_filenames, test_filenames = get_filenames(data_path)
 
 print(len(train_filenames), 'train samples')
 print(len(test_filenames), 'test samples')
@@ -26,7 +53,7 @@ model_name = 'rotnet_street_view_resnet50'
 # number of classes
 nb_classes = 360
 # input image shape
-input_shape = (224, 224, 3)
+input_shape = (448, 448, 3)
 
 # load base model
 base_model = ResNet50(weights='imagenet', include_top=False,
@@ -44,11 +71,11 @@ model.summary()
 
 # model compilation
 model.compile(loss='categorical_crossentropy',
-              optimizer=SGD(lr=0.01, momentum=0.9),
+              optimizer=SGD(learning_rate=0.0001, momentum=0.9),
               metrics=[angle_error])
 
 # training parameters
-batch_size = 64
+batch_size = 16
 nb_epoch = 50
 
 output_folder = 'models'
@@ -67,7 +94,7 @@ early_stopping = EarlyStopping(monitor=monitor, patience=5)
 tensorboard = TensorBoard()
 
 # training loop
-model.fit_generator(
+model.fit(
     RotNetDataGenerator(
         train_filenames,
         input_shape=input_shape,
