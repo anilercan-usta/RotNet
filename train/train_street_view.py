@@ -13,10 +13,24 @@ from keras.optimizers import SGD
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils import angle_error, RotNetDataGenerator
 from data.street_view import get_filenames as get_street_view_filenames
+from keras.callbacks import Callback
 
 import numpy as np
 # to measure exec time
 from timeit import default_timer as timer
+
+
+class PrintErrorMetricCallback(Callback):
+    def __init__(self, metric_name):
+        super(PrintErrorMetricCallback, self).__init__()
+        self.metric_name = metric_name
+
+    def on_epoch_end(self, epoch, logs=None):
+        error_metric_value = logs[self.metric_name]
+        print(f"Epoch {epoch + 1} - {self.metric_name}: {error_metric_value}")
+
+
+
 
 def get_filenames(path):
     
@@ -41,7 +55,7 @@ def get_filenames(path):
 #train_filenames, test_filenames = get_street_view_filenames(data_path)
 
 
-data_path = "C:\\Users\\anile\\Desktop\\sayac-okuma-part1.v3i.createml\\cropped_sayac"
+data_path = "/content/drive/MyDrive/cropped_sayac"
 
 train_filenames, test_filenames = get_filenames(data_path)
 
@@ -89,6 +103,10 @@ checkpointer = ModelCheckpoint(
     monitor=monitor,
     save_best_only=True
 )
+
+error_metric_to_print = "val_loss"  # Replace with the metric you want to print
+print_error_metric_callback = PrintErrorMetricCallback(error_metric_to_print)
+
 reduce_lr = ReduceLROnPlateau(monitor=monitor, patience=3)
 early_stopping = EarlyStopping(monitor=monitor, patience=5)
 tensorboard = TensorBoard()
@@ -115,6 +133,6 @@ model.fit(
         crop_largest_rect=True
     ),
     validation_steps=len(test_filenames) / batch_size,
-    callbacks=[checkpointer, reduce_lr, early_stopping, tensorboard],
+    callbacks=[checkpointer, reduce_lr, early_stopping, tensorboard, print_error_metric_callback],
     workers=10
 )
