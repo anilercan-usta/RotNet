@@ -53,7 +53,7 @@ model_name = 'rotnet_street_view_resnet50'
 # number of classes
 nb_classes = 360
 # input image shape
-input_shape = (448, 448, 3)
+input_shape = (224, 224, 3)
 
 # load base model
 base_model = ResNet50(weights='imagenet', include_top=False,
