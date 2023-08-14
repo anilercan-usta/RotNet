@@ -133,6 +133,6 @@ model.fit(
         crop_largest_rect=True
     ),
     validation_steps=len(test_filenames) / batch_size,
-    callbacks=[checkpointer, reduce_lr, early_stopping, tensorboard, print_error_metric_callback],
+    callbacks=[checkpointer, reduce_lr, early_stopping, tensorboard],
     workers=10
 )
