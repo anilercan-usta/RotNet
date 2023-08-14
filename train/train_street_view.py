@@ -55,7 +55,7 @@ def get_filenames(path):
 #train_filenames, test_filenames = get_street_view_filenames(data_path)
 
 
-data_path = "/content/drive/MyDrive/cropped_sayac"
+data_path = "/content/drive/MyDrive/cropped_sayac_3300"
 
 train_filenames, test_filenames = get_filenames(data_path)
 
