@@ -107,8 +107,8 @@ checkpointer = ModelCheckpoint(
 error_metric_to_print = "val_loss"  # Replace with the metric you want to print
 print_error_metric_callback = PrintErrorMetricCallback(error_metric_to_print)
 
-reduce_lr = ReduceLROnPlateau(monitor=monitor, patience=3)
-early_stopping = EarlyStopping(monitor=monitor, patience=5)
+reduce_lr = ReduceLROnPlateau(monitor=monitor, patience=15)
+early_stopping = EarlyStopping(monitor=monitor, patience=20)
 tensorboard = TensorBoard()
 
 # training loop
